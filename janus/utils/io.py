@@ -65,7 +65,7 @@ def load_pil_images(conversations: List[Dict[str, str]]) -> List[PIL.Image.Image
     pil_images = []
 
     for message in conversations:
-        if "images" not in message:
+        if "images" not in message or message["images"] == None:
             continue
 
         for image_data in message["images"]:

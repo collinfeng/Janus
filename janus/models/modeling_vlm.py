@@ -218,6 +218,39 @@ class MultiModalityCausalLM(MultiModalityPreTrainedModel):
         language_config = config.language_config
         self.language_model = LlamaForCausalLM(language_config)
 
+    def forward(
+        self,
+        input_ids: torch.LongTensor = None,
+        pixel_values: torch.FloatTensor = None,
+        images_seq_mask: torch.LongTensor = None,
+        images_emb_mask: torch.LongTensor = None,
+        attention_mask: torch.Tensor = None,
+        labels: torch.LongTensor = None,
+        **kwargs
+    ):
+        # Prepare inputs_embeds using individual components
+        inputs_embeds = self.prepare_inputs_embeds(
+            input_ids=input_ids,
+            pixel_values=pixel_values,
+            images_seq_mask=images_seq_mask,
+            images_emb_mask=images_emb_mask
+        )
+        
+        kwargs.pop("inputs_embeds", None)
+      
+        print(labels.shape)
+        print(inputs_embeds.shape)
+        
+        # Pass to language model
+        llm_outputs = self.language_model(
+            inputs_embeds=inputs_embeds,
+            attention_mask=attention_mask,
+            labels=labels,
+            **kwargs
+        )
+        
+        return llm_outputs  # Includes loss, logits, etc.
+
     def prepare_inputs_embeds(
         self,
         input_ids: torch.LongTensor,
@@ -255,7 +288,7 @@ class MultiModalityCausalLM(MultiModalityPreTrainedModel):
         inputs_embeds = self.language_model.get_input_embeddings()(input_ids)
 
         # replace with the image embeddings
-        inputs_embeds[images_seq_mask] = images_embeds[images_emb_mask]
+        inputs_embeds[images_seq_mask] = images_embeds[images_emb_mask].to(dtype=inputs_embeds.dtype)
 
         return inputs_embeds
 
