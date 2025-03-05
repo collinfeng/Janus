@@ -229,7 +229,8 @@ class VLChatProcessor(ProcessorMixin):
         """
 
         input_slices = []
-
+        # print(image_indices)
+        # print(input_ids.shape)
         start = 0
         for index in image_indices:
             if self.add_special_token:
@@ -299,6 +300,7 @@ class VLChatProcessor(ProcessorMixin):
         input_ids = self.tokenizer.encode(sft_format)
         input_ids = torch.LongTensor(input_ids)
 
+
         # add image tokens to the input_ids
         image_token_mask: torch.BoolTensor = input_ids == self.image_id
         image_indices = image_token_mask.nonzero()
@@ -306,7 +308,6 @@ class VLChatProcessor(ProcessorMixin):
             image_indices=image_indices,
             input_ids=input_ids,
         )
-
         # load images
         images_outputs = self.image_processor(images, return_tensors="pt")
 

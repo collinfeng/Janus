@@ -238,8 +238,8 @@ class MultiModalityCausalLM(MultiModalityPreTrainedModel):
         
         kwargs.pop("inputs_embeds", None)
       
-        print(labels.shape)
-        print(inputs_embeds.shape)
+        # print(labels.shape)
+        # print(inputs_embeds.shape)
         
         # Pass to language model
         llm_outputs = self.language_model(
